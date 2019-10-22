@@ -2,20 +2,21 @@
 cd $HOME
 
 # Variables
+DOTFILES_GIT_REPO='https://github.com/lm-w1n5t0n/dotfiles.git'
 DOTFILES_GIT_DIR=$HOME/.config/.dotfiles
 DOTFILES_BACKUP_DIR=$DOTFILES_GIT_DIR/backup
 
-#function mv-p {
-#    mkdir -p "$(dirname $2)"
-#    mv $1 $2
-#}
+# function mv-p {
+#     mkdir -p "$(dirname $2)"
+#     mv $1 $2
+# }
 
 # Delete the previous dotfiles git repo, just to be sure
 rm -rf $DOTFILES_GIT_DIR
 
 # Clone bare repo
 git clone --bare \
-    https://github.com/lnfiniteMonkeys/dotfiles.git/ \
+    $DOTFILES_GIT_REPO\
     $DOTFILES_GIT_DIR
 
 alias dotfiles="git --git-dir=$DOTFILES_GIT_DIR --work-tree=$HOME"

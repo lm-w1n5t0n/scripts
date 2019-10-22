@@ -1,0 +1,39 @@
+#!/usr/bin/sh
+cd $HOME
+
+# Variables
+DOTFILES_GIT_DIR=$HOME/.config/.dotfiles
+DOTFILES_BACKUP_DIR=$DOTFILES_GIT_DIR/backup
+
+#function mv-p {
+#    mkdir -p "$(dirname $2)"
+#    mv $1 $2
+#}
+
+# Delete the previous dotfiles git repo, just to be sure
+rm -rf $DOTFILES_GIT_DIR
+
+# Clone bare repo
+git clone --bare \
+    https://github.com/lnfiniteMonkeys/dotfiles.git/ \
+    $DOTFILES_GIT_DIR
+
+alias dotfiles="git --git-dir=$DOTFILES_GIT_DIR --work-tree=$HOME"
+
+# Attempt to checkout
+dotfiles checkout
+if [ $? = 0 ]; then
+    echo "Checked out dotfiles.";
+else
+    # If failed, backup any existing dotfiles and checkout again
+    echo "Pre-existing dotfiles found, backing them up at" $DOTFILES_BACKUP_DIR
+    dotfiles checkout 2>&1 \
+	| egrep "\s" \
+	| awk {'print $1'} \
+	| awk 'NR>2 {print last} {last=$0}' \
+	| xargs -I {} mkdir -p "$(dirname {})"; mv {} $DOTFILES_BACKUP_DIR/{}
+    dotfiles checkout
+    echo "Dotfiles checked out successfully."
+fi;
+
+dotfiles config status.showUntrackedFiles no
